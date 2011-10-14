@@ -1,0 +1,10 @@
+<h2>Estimate Reflection</h2>
+
+<p>Available projects:</p>
+<ul>
+<% @projects.each do |p| %>
+  <li>
+    <%= link_to p.name, { :action => "show", :id => p.id } %>   
+  </li
+<% end %>
+</ul>

@@ -1,0 +1,74 @@
+<h2>Estimate Reflection: <%= @project.name %></h2>
+
+<ul>
+<% @versions.each do |v| %>
+  <li>
+    <h3><%= v.name %></h3>
+    <ul>
+      <% @issues.each do |i| %>
+        <% if i.fixed_version_id == v.id %>
+          <li>
+            <strong><%= link_to "##{i.id}", {:controller => "issues", :action => "show" , :id => i.id } %> <%= i.subject %>
+            </strong>: estimated: <%= i.estimated_hours %>h - spent: <%= i.spent_hours %>h //
+            
+            <% diff_percent =  i.spent_hours / i.estimated_hours * 100  %>
+            difference:
+            <% if diff_percent < 85 %>
+              <span style="color:green;">+<%= i.estimated_hours - i.spent_hours %>
+            <% elsif diff_percent < 115 %>
+              <span style="color:orange;"><%= i.estimated_hours - i.spent_hours %>
+            <% else %>
+              <span style="color:red;"><%= i.estimated_hours - i.spent_hours %>
+            <% end %>
+              -- <%= diff_percent %>% 
+            </span>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>          
+  </li>
+<% end %>
+</ul>
+
+    <p>
+      min: <%= @min %>                           <br/>
+      max: <%= @max %>
+    </p>
+      total_estimate: <%= @total_estimate %><br/>
+      total_spent: <%= @total_spent %>      <br/>
+      difference: 
+      <% if @total_estimate > @total_spent %>
+        <span style="color:green;">+<%= @total_estimate -@total_spent %>
+      <% else %>
+        <span style="color:red;"><%= @total_estimate - @total_spent %>
+      <% end %>  
+         <% @diff_percent =  @total_spent / @total_estimate * 100  %>
+         -- <%= @diff_percent  %>% 
+         <% if @diff_percent > 115 %>
+            // ALERT, spent time is more than 115% of estimated time!
+         <% end %> 
+         </span>
+    </p>
+
+<hr />
+
+<table>
+<tr>
+  <td>#1 concept</td>
+  <td>&nbsp;</td>
+  <td>|</td>
+  <td>&nbsp;</td>
+</tr>
+<tr>
+  <td>#1 concept</td>
+  <td>&nbsp;</td>
+  <td>|</td>
+  <td>&nbsp;</td>
+</tr>
+<tr>
+  <td>#1 concept</td>
+  <td>&nbsp;</td>
+  <td>|</td>
+  <td>&nbsp;</td>
+</tr>
+</table>

@@ -1,0 +1,16 @@
+table.progress td {
+   padding: 0px 0;
+}
+
+strong.closed {
+   text-decoration: line-through;
+}
+
+div.reflection_version h3,
+div.reflection_resumee h3 {
+  margin-top: 20px;
+}
+
+div.reflection_resumee td {
+   font-weight: bold;
+}

@@ -1,74 +1,173 @@
-<h2>Estimate Reflection: <%= @project.name %></h2>
+<h2>Estimate Reflection: <%= link_to @project.name, {:controller => "project", :action => "show" , :id => @project.id } %></h2>
 
-<ul>
 <% @versions.each do |v| %>
-  <li>
+  <div class="reflection_version">
     <h3><%= v.name %></h3>
-    <ul>
+    <table>
+      <tr>
+        <th>Issue</th>
+        <th>Done &nbsp;</th>
+        <th>Estimated &nbsp;</th>
+        <th>Spent</th>
+        <th>Ratio</th>
+      </tr>
       <% @issues.each do |i| %>
         <% if i.fixed_version_id == v.id %>
-          <li>
-            <strong><%= link_to "##{i.id}", {:controller => "issues", :action => "show" , :id => i.id } %> <%= i.subject %>
-            </strong>: estimated: <%= i.estimated_hours %>h - spent: <%= i.spent_hours %>h //
+          <tr>
+            <td style="width: 330px;">
+            <strong class="<%= i.css_classes %> details" title="<%= i.subject %>"><%= link_to "##{i.id}", {:controller => "issues", :action => "show" , :id => i.id } %> <%= i.subject[0..35] %>
+            </strong>
+            </td>
+            <td>
+              <%= i.done_ratio %>%
+            </td>
+            <td>
+              <%= i.estimated_hours %>h
+            </td>
+            <td>
+              <%= round_to(i.spent_hours) %>h
+            </td>
             
-            <% diff_percent =  i.spent_hours / i.estimated_hours * 100  %>
-            difference:
-            <% if diff_percent < 85 %>
-              <span style="color:green;">+<%= i.estimated_hours - i.spent_hours %>
-            <% elsif diff_percent < 115 %>
-              <span style="color:orange;"><%= i.estimated_hours - i.spent_hours %>
+            <% unit = (240/40).round.to_i %>
+            <% if i.estimated_hours > 0 %>
+              <% diff_percent =  ( round_to(i.spent_hours) / i.estimated_hours * 100).round.to_i  %>
             <% else %>
-              <span style="color:red;"><%= i.estimated_hours - i.spent_hours %>
+              <% diff_percent =  0  %>
             <% end %>
-              -- <%= diff_percent %>% 
-            </span>
-          </li>
+            <% difference = i.estimated_hours - round_to(i.spent_hours) %>
+            
+           
+            <td>
+            <table class="progress" style="width: 490px;">
+              <tr>
+                <% if diff_percent == 0 %>   
+                    <td style="width: 240px; background-color: #DDD;"></td>
+                    <td class="center" style="width: 10px; background-color: #DDD;">|</td>
+                    <td class="difference_neg" style="width: 240px; background-color: #DDD;"></td>                
+                <% elsif diff_percent < 85 %>
+                  <% v1 =  (240 - ( difference * unit )).to_i %>
+                  <% v2 =  240 - v1 %>
+                  <td style="width: <%= v1 %>px;"><%=difference%></td>
+                  <td class="difference_pos" style="width: <%= v2 %>px; background-color: #33CC66;"></td>                                                                                   
+                  <td class="center" style="width: 10px">|</td>
+                  <td style="width: 240px;">&nbsp;</td>
+                <% elsif diff_percent < 115 %>
+                  <% if diff_percent < 101 %>
+                    <% v1 =  240 - ( difference * unit ) %>
+                    <% v2 =  240 - v1 %>
+                    <td style="width: <%= v1 %>px;"><%=difference%></td>
+                    <td class="difference_pos" style="width: <%= v2 %>px; background-color: #99FF00;"></td>                                                                                   
+                    <td class="center" style="width: 10px">|</td>
+                    <td style="width: 240px;">&nbsp;</td>
+                  <% else %>              
+                    <td style="width: 240px;">&nbsp;</td>
+                    <% v1 =  ( difference * unit ) + 240  %>
+                    <% v2 =  240 - v1 %>                                                                                   
+                    <td class="center" style="width: 10px">|</td>
+                    <td class="difference_neg" style="width: <%= v2 %>px; background-color: yellow;"></td>
+                    <td style="width: <%= v1 %>px;"><%=difference%></td>
+                  <% end %>
+                <% else %>
+                    <td style="width: 240px;">&nbsp;</td>
+                    <% v1 =  ( difference * unit ) + 240 %>
+                    <% v2 =  240 - v1 %>                                                                                   
+                    <td class="center" style="width: 10px">|</td>
+                    <td class="difference_neg" style="width: <%= v2 %>px; background-color: red;"></td>
+                    <td style="width: <%= v1 %>px;"><%=difference%></td>                              
+                <% end %>
+                  <%= diff_percent %>% 
+                </span>
+              </tr>
+            </table>
+            
+            </td>
+          </tr>
         <% end %>
-      <% end %>
-    </ul>          
-  </li>
+      <% end %>          
+  </table>
+  </div>
 <% end %>
-</ul>
-
-    <p>
-      min: <%= @min %>                           <br/>
-      max: <%= @max %>
-    </p>
-      total_estimate: <%= @total_estimate %><br/>
-      total_spent: <%= @total_spent %>      <br/>
-      difference: 
-      <% if @total_estimate > @total_spent %>
-        <span style="color:green;">+<%= @total_estimate -@total_spent %>
+<div class="reflection_resumee">
+  <h3>Total: <%= link_to @project.name, {:controller => "project", :action => "show" , :id => @project.id } %>
+</h3>
+  <table>
+    <tr>
+      <th>Project</th>
+      <th>Done  &nbsp;</th>      
+      <th>Estimated  &nbsp;</th>
+      <th>Spent</th>
+    <th>Ratio</th>
+    </tr>
+    <tr>
+      <td style="width: 330px;">
+      <strong><%= link_to @project.name, {:controller => "project", :action => "show" , :id => @project.id } %>
+      </strong>
+      </td>
+      <td>
+        <%= @total_done %>%
+      </td>
+      <td>
+        <%= @total_estimate %>h
+      </td>
+      <td>
+        <%= round_to(@total_spent) %>h
+      </td>
+      <% unit = (240/40).round.to_i %>
+      <% if @total_estimate > 0 %>
+        <% diff_percent =  ( round_to(@total_spent) / @total_estimate * 100).round.to_i  %>
       <% else %>
-        <span style="color:red;"><%= @total_estimate - @total_spent %>
-      <% end %>  
-         <% @diff_percent =  @total_spent / @total_estimate * 100  %>
-         -- <%= @diff_percent  %>% 
-         <% if @diff_percent > 115 %>
-            // ALERT, spent time is more than 115% of estimated time!
-         <% end %> 
-         </span>
-    </p>
+         <% diff_percent =  0  %>
+      <% end %>
+      <% difference = @total_estimate - round_to(@total_spent) %>            
+      <td>
+      <table class="progress" style="width: 490px;">
+        <tr>
+          <% if diff_percent < 85 %>
+            <% v1 =  (240 - ( difference * unit )).to_i %>
+            <% v2 =  240 - v1 %>
+            <td style="width: <%= v1 %>px;"><%=difference%></td>
+            <td class="difference_pos" style="width: <%= v2 %>px; background-color: #33CC66;"></td>                                                                                   
+            <td class="center" style="width: 10px">|</td>
+            <td style="width: 240px;">&nbsp;</td>
+          <% elsif diff_percent < 115 %>
+            <% if diff_percent < 100 %>
+              <% v1 =  240 - ( difference * unit ) %>
+              <% v2 =  240 - v1 %>
+              <td style="width: <%= v1 %>px;"><%=difference%></td>
+              <td class="difference_pos" style="width: <%= v2 %>px; background-color: #99FF00;"></td>                                                                                   
+              <td class="center" style="width: 10px">|</td>
+              <td style="width: 240px;">&nbsp;</td>
+            <% else %>              
+              <td style="width: 240px;">&nbsp;</td>
+              <% v1 =  ( difference * unit ) + 240  %>
+              <% v2 =  240 - v1 %>                                                                                   
+              <td class="center" style="width: 10px">|</td>
+              <td class="difference_neg" style="width: <%= v2 %>px; background-color: yellow;"></td>
+              <td style="width: <%= v1 %>px;"><%=difference%></td>
+            <% end %>
+          <% elsif diff_percent < 999 %>
+              <td style="width: 240px;">&nbsp;</td>
+              <% v1 =  ( difference * unit ) + 240 %>
+              <% v2 =  240 - v1 %>                                                                                   
+              <td class="center" style="width: 10px">|</td>
+              <td class="difference_neg" style="width: <%= v2 %>px; background-color: red;"></td>
+              <td style="width: <%= v1 %>px;"><%=difference%></td>   
+          <% else %>   
+              <td style="width: 240px; background-color: silver;"></td>
+              <td class="center" style="width: 10px; background-color: silver;">|</td>
+              <td class="difference_neg" style="width: 240px; background-color: silver;"></td>                             
+          <% end %>
+            <%= diff_percent %>% 
+          </span>
+        </tr>
+      </table>
+      
+      </td>
+    </tr>          
+  </table>
+</div>
 
-<hr />
 
-<table>
-<tr>
-  <td>#1 concept</td>
-  <td>&nbsp;</td>
-  <td>|</td>
-  <td>&nbsp;</td>
-</tr>
-<tr>
-  <td>#1 concept</td>
-  <td>&nbsp;</td>
-  <td>|</td>
-  <td>&nbsp;</td>
-</tr>
-<tr>
-  <td>#1 concept</td>
-  <td>&nbsp;</td>
-  <td>|</td>
-  <td>&nbsp;</td>
-</tr>
-</table>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'reflection', :plugin => 'redmine_estimate_reflection' %>
+<% end %>

@@ -32,7 +32,7 @@
               <%= round_to(i.spent_hours) %>h
             </td>
             
-            <% unit = (240/40).round.to_i %>
+            <% unit = (240/50).round.to_i %>
             <% if i.estimated_hours > 0 %>
               <% diff_percent =  ( round_to(i.spent_hours) / i.estimated_hours * 100).round.to_i  %>
             <% elsif i.spent_hours == 0 %>
@@ -129,7 +129,7 @@
       <td>
         <%= round_to(@total_spent) %>h
       </td>
-      <% unit = (240/40).round.to_i %>
+      <% unit = (240/50).round.to_i %>
       <% if @total_estimate > 0 %>
         <% diff_percent =  ( round_to(@total_spent) / @total_estimate * 100).round.to_i  %>
       <% else %>

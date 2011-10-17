@@ -22,7 +22,11 @@
               <%= i.done_ratio %>%
             </td>
             <td>
-              <%= i.estimated_hours %>h
+              <%if i.estimated_hours > 0 %>
+                <%= i.estimated_hours %>h
+              <% else %>
+                <strong style="color: red;"><%= i.estimated_hours %>h</strong>
+              <% end %>
             </td>
             <td>
               <%= round_to(i.spent_hours) %>h
@@ -31,8 +35,10 @@
             <% unit = (240/40).round.to_i %>
             <% if i.estimated_hours > 0 %>
               <% diff_percent =  ( round_to(i.spent_hours) / i.estimated_hours * 100).round.to_i  %>
-            <% else %>
+            <% elsif i.spent_hours == 0 %>
               <% diff_percent =  0  %>
+            <% else %>
+              <% diff_percent =  999  %>
             <% end %>
             <% difference = i.estimated_hours - round_to(i.spent_hours) %>
             
@@ -41,41 +47,52 @@
             <table class="progress" style="width: 490px;">
               <tr>
                 <% if diff_percent == 0 %>   
-                    <td style="width: 240px; background-color: #DDD;"></td>
-                    <td class="center" style="width: 10px; background-color: #DDD;">|</td>
+                    <td style="width: 240px; background-color: #DDD;" class="pos"></td>
+                    <td class="center" style="width: 1px; background-color: #DDD;"></td>
                     <td class="difference_neg" style="width: 240px; background-color: #DDD;"></td>                
                 <% elsif diff_percent < 85 %>
-                  <% v1 =  (240 - ( difference * unit )).to_i %>
+                  <% v1 =  (240 - ( ( difference + 1) * unit )).to_i %>
                   <% v2 =  240 - v1 %>
-                  <td style="width: <%= v1 %>px;"><%=difference%></td>
+                  <td style="width: <%= v1 %>px;" class="pos"><%=difference%> &nbsp;</td>
                   <td class="difference_pos" style="width: <%= v2 %>px; background-color: #33CC66;"></td>                                                                                   
-                  <td class="center" style="width: 10px">|</td>
+                   <td class="center" style="width: 1px"></td>
                   <td style="width: 240px;">&nbsp;</td>
                 <% elsif diff_percent < 115 %>
-                  <% if diff_percent < 101 %>
-                    <% v1 =  240 - ( difference * unit ) %>
+                  <% if diff_percent < 100 %>
+                    <% v1 =  240 - ( ( difference + 1) * unit ) %>
                     <% v2 =  240 - v1 %>
-                    <td style="width: <%= v1 %>px;"><%=difference%></td>
+                    <td style="width: <%= v1 %>px;" class="pos"><%=difference%> &nbsp;</td>
                     <td class="difference_pos" style="width: <%= v2 %>px; background-color: #99FF00;"></td>                                                                                   
-                    <td class="center" style="width: 10px">|</td>
+                    <td class="center" style="width: 1px"></td>
+                    <td style="width: 240px;">&nbsp;</td>
+                  <% elsif diff_percent == 100 %>
+                    <% v1 =  240 - ( 1 * unit ) %>
+                    <% v2 =  240 - v1 %>
+                    <td style="width: <%= v1 %>px;" class="pos"><%=difference%> &nbsp;</td>
+                    <td class="difference_pos" style="width: <%= v2 %>px; background-color: #99FF00;"></td>                                                                                   
+                    <td class="center" style="width: 1px"></td>
                     <td style="width: 240px;">&nbsp;</td>
                   <% else %>              
                     <td style="width: 240px;">&nbsp;</td>
                     <% v1 =  ( difference * unit ) + 240  %>
                     <% v2 =  240 - v1 %>                                                                                   
-                    <td class="center" style="width: 10px">|</td>
+                    <td class="center" style="width: 1px"></td>
                     <td class="difference_neg" style="width: <%= v2 %>px; background-color: yellow;"></td>
-                    <td style="width: <%= v1 %>px;"><%=difference%></td>
+                    <td style="width: <%= v1 %>px;" class="neg">&nbsp; <%=difference%></td>
                   <% end %>
                 <% else %>
                     <td style="width: 240px;">&nbsp;</td>
                     <% v1 =  ( difference * unit ) + 240 %>
                     <% v2 =  240 - v1 %>                                                                                   
-                    <td class="center" style="width: 10px">|</td>
+                    <td class="center" style="width: 1px"></td>
                     <td class="difference_neg" style="width: <%= v2 %>px; background-color: red;"></td>
-                    <td style="width: <%= v1 %>px;"><%=difference%></td>                              
+                    <td style="width: <%= v1 %>px;" class="neg">&nbsp; <%=difference%></td>                              
                 <% end %>
-                  <%= diff_percent %>% 
+                  <% if diff_percent == 999 %>
+                    ???%
+                  <% else %>
+                    <%= diff_percent %>%
+                  <% end %> 
                 </span>
               </tr>
             </table>
@@ -118,7 +135,7 @@
       <% else %>
          <% diff_percent =  0  %>
       <% end %>
-      <% difference = @total_estimate - round_to(@total_spent) %>            
+      <% difference = round_to(@total_estimate) - round_to(@total_spent) %>            
       <td>
       <table class="progress" style="width: 490px;">
         <tr>
@@ -127,34 +144,34 @@
             <% v2 =  240 - v1 %>
             <td style="width: <%= v1 %>px;"><%=difference%></td>
             <td class="difference_pos" style="width: <%= v2 %>px; background-color: #33CC66;"></td>                                                                                   
-            <td class="center" style="width: 10px">|</td>
+            <td class="center" style="width: 1px"></td>
             <td style="width: 240px;">&nbsp;</td>
           <% elsif diff_percent < 115 %>
             <% if diff_percent < 100 %>
               <% v1 =  240 - ( difference * unit ) %>
               <% v2 =  240 - v1 %>
-              <td style="width: <%= v1 %>px;"><%=difference%></td>
+              <td style="width: <%= v1 %>px;" class="pos"><%=difference%> &nbsp;</td>
               <td class="difference_pos" style="width: <%= v2 %>px; background-color: #99FF00;"></td>                                                                                   
-              <td class="center" style="width: 10px">|</td>
+              <td class="center" style="width: 1px"></td>
               <td style="width: 240px;">&nbsp;</td>
             <% else %>              
               <td style="width: 240px;">&nbsp;</td>
               <% v1 =  ( difference * unit ) + 240  %>
               <% v2 =  240 - v1 %>                                                                                   
-              <td class="center" style="width: 10px">|</td>
+              <td class="center" style="width: 1px"></td>
               <td class="difference_neg" style="width: <%= v2 %>px; background-color: yellow;"></td>
-              <td style="width: <%= v1 %>px;"><%=difference%></td>
+              <td style="width: <%= v1 %>px;" class="neg">&nbsp; <%=round_to(difference)%></td>
             <% end %>
           <% elsif diff_percent < 999 %>
               <td style="width: 240px;">&nbsp;</td>
               <% v1 =  ( difference * unit ) + 240 %>
               <% v2 =  240 - v1 %>                                                                                   
-              <td class="center" style="width: 10px">|</td>
+              <td class="center" style="width: 1px"></td>
               <td class="difference_neg" style="width: <%= v2 %>px; background-color: red;"></td>
-              <td style="width: <%= v1 %>px;"><%=difference%></td>   
+              <td style="width: <%= v1 %>px;" class="neg">&nbsp; <%=difference%></td>   
           <% else %>   
               <td style="width: 240px; background-color: silver;"></td>
-              <td class="center" style="width: 10px; background-color: silver;">|</td>
+              <td class="center" style="width: 1px"></td>
               <td class="difference_neg" style="width: 240px; background-color: silver;"></td>                             
           <% end %>
             <%= diff_percent %>% 

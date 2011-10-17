@@ -1,5 +1,17 @@
 table.progress td {
    padding: 0px 0;
+   height: 15px;
+}
+table.progress td.pos{
+  text-align: right;
+}
+table.progress td.neg {
+  text-align: left;
+}
+table.progress td.center {
+   border: 1px solid silver;
+   margin: 0; padding: 0; width: 0px !important;
+  cell-spacing: 0;
 }
 
 strong.closed {
